@@ -1,30 +1,33 @@
 from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
-from werkzeug.security import generate_password_hash, check_password_hash
-from models import AdminLogin
+
+
+class AdminLogin(BaseModel):
+    Email: str
+    Matricula: str
+
 
 app = FastAPI()
 
-#base de datos ejemplo
-client = AsyncIOMotorClient("mongodb://localhost:27017")
-db = client.my_database
+client = AsyncIOMotorClient("mongodb+srv://dazayy:pononoinuv@adminpp.dywe5yc.mongodb.net/?retryWrites=true&w=majority&appName=AdminPP")
+db = client.AdminPP
 admins_collection = db.admins
 
-#login admins agregados en bd
+
+# Login para admins agregados en la base de datos
 @app.post("/login")
 async def login(admin: AdminLogin):
-    # checa matriculas existentes 
-    db_admins = await admins_collection.find_one({"matricula": {"$exists": True}, "matricula": admin.matricula})
-    if not db_admins:
-        raise HTTPException(status_code=400, detail="No exite la matricula")
+    # Busca admins por email y matricula
+    db_admin = await admins_collection.find_one({
+        "$and": [
+            {"email": admin.Email},
+            {"matricula": admin.Matricula},
+        ]
+    })
 
-    # valida contraseñas
-    if not check_password_hash(db_admins["hashed_password"], admin.password):
-        raise HTTPException(status_code=400, detail="Contraseña incorrecta")
-
-    return {"message": "Login correcto"}
-
+    if not db_admin:
+        raise HTTPException(status_code=400, detail="Email o matrícula incorrecta")
 
 if __name__ == "__main__":
     import uvicorn

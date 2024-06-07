@@ -1,34 +1,33 @@
-from fastapi import FastAPI, Depends, HTTPException, Request
-from fastapi.responses import RedirectResponse
-from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel
-from starlette.middleware.sessions import SessionMiddleware
+from motor.motor_asyncio import AsyncIOMotorClient
+
+class Admin(BaseModel):
+    Nombre: str
+    Email: str
+    Imagen: str
+
 
 app = FastAPI()
 
-# Configuración para el manejo de sesiones
-app.add_middleware(SessionMiddleware, secret_key="my_secret_key")
-
-# Templates para renderizar las vistas HTML opcional
-templates = Jinja2Templates(directory="templates")
-
-# Modelos de datos Pydantic
-class Admin(BaseModel):
-    name: str
-    email: str
-    picture: str
-
-# Rutas
-@app.get("/home")
-async def home(request: Request):
-    admin = request.session.get("admin")
-    if not admin:
-        return RedirectResponse(url="/login")
-
-    return templates.TemplateResponse("home.html", {"request": request, "admin": admin})
+client = AsyncIOMotorClient("mongodb+srv://dazayy:pononoinuv@adminpp.dywe5yc.mongodb.net/?retryWrites=true&w=majority&appName=AdminPP")
+db = client.AdminPP
+admins_collection = db.admins
 
 
-@app.post("/logout")
-async def logout(request: Request):
-    request.session.clear()
-    return RedirectResponse(url="/login")
+@app.get("/admin")
+async def get_admin_data(Matricula: str): 
+    db_admin = await admins_collection.find_one({"_Matricula": Matricula})  
+
+    if not db_admin:
+        raise HTTPException(status_code=404, detail="Admin no encontrado")
+
+    admin = Admin(**db_admin)
+
+    return admin
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)
