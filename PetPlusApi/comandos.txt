@@ -1,0 +1,20 @@
+para correr el back es uvicorn main:app --reload
+
+cada forma de mandar a traer datos es especial ej http://127.0.0.1:8000/api/admins/ esto manda a traer todos los datos
+
+para mandar a traer cada uno es por Object Id ej http://127.0.0.1:8000/api/admins/6663e54a23319bd9bfa43b63
+para eliminar y actualizar es el mismo comando de arriba solo se le cambia el objectId
+
+para subir json 
+en postman o insomnia no agarra el post error aun no detiene el sistema
+
+{"_id":{"$oid":"34564a68e2e0d51831aca49dd"},
+  "Matricula": "s21020567",
+  "Nombre": "Antonio",
+  "Apellido": "Rincon Villegas",
+  "Edad": "22 años",
+  "Turno": "Vespertino",
+  "Correo": "antonriv@gmail.com",
+  "Imagen": ""
+}
+  
