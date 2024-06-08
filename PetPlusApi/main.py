@@ -51,5 +51,3 @@ async def delete_admin(id: str):
     else:
         raise HTTPException(status_code=404, detail=f"Admin with ID '{id}' not found")
 
-
-
