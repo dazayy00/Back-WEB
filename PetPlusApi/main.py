@@ -1,19 +1,26 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from database import get_all_admins, create_admin, get_one_admin_by_id, update, delete
 from models import Admin
-from bson import ObjectId
-
+from login import router as login_router
 
 app = FastAPI()
 
-#get de todos 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(login_router, prefix="/login", tags=["login"])
+
 @app.get('/api/admins', response_model=list[Admin]) 
 async def get_admins():
     admins = await get_all_admins()
     return admins
 
-#get uno solo 
-#manda a traer por el ObjectId de cada
 @app.get('/api/admins/{id}', response_model=Admin)
 async def get_admin_by_id(id: str):
     admin = await get_one_admin_by_id(id)
@@ -22,17 +29,13 @@ async def get_admin_by_id(id: str):
     else:
         raise HTTPException(status_code=404, detail=f"Admin with ID '{id}' not found")
 
-#post de admin
 @app.post('/api/admins', response_model=Admin)
 async def create_admin(admin: Admin):  
-    response = await create_admin(admin) #linea de error post 
+    response = await create_admin(admin)
     if response:
         return response
     raise HTTPException(status_code=400, detail="Error creating admin")
 
-
-
-#update de admin
 @app.put('/api/admins/{id}', response_model=Admin)
 async def update_admin(id: str, admin_data: Admin):
     updated_admin = await update(id, admin_data.dict())
@@ -41,8 +44,6 @@ async def update_admin(id: str, admin_data: Admin):
     else:
         raise HTTPException(status_code=404, detail=f"Admin with ID '{id}' not found")
 
-
-#delete de admin 
 @app.delete('/api/admins/{id}', status_code=204)
 async def delete_admin(id: str):
     deleted = await delete(id)
@@ -50,4 +51,3 @@ async def delete_admin(id: str):
         return None
     else:
         raise HTTPException(status_code=404, detail=f"Admin with ID '{id}' not found")
-
