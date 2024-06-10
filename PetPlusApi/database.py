@@ -33,4 +33,15 @@ async def delete(id: str):
 
 async def get_admin_by_matricula(matricula: str):
     admin = await collection.find_one({'Matricula': matricula})
-    return admin
+    if admin:
+        return {
+            "Matricula": admin["Matricula"],
+            "Nombre": admin["Nombre"],
+            "Apellido": admin["Apellido"],
+            "Edad": admin["Edad"],
+            "Turno": admin["Turno"],
+            "Correo": admin["Correo"],
+            "Imagen": admin["Imagen"]
+        }
+    return None
+
