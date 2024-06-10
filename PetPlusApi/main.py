@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from database import get_all_admins, create_admin, get_one_admin_by_id, update, delete
 from models import Admin
 from login import router as login_router
+from home import router as home_router
 
 app = FastAPI()
 
@@ -15,6 +16,7 @@ app.add_middleware(
 )
 
 app.include_router(login_router, prefix="/login", tags=["login"])
+app.include_router(home_router, prefix="", tags=["home"])
 
 @app.get('/api/admins', response_model=list[Admin]) 
 async def get_admins():

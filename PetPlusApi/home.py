@@ -1,11 +1,10 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from database import get_admin_by_matricula
 from models import Admin
 
-app = FastAPI()
+router = APIRouter()
 
-
-@app.get("/admin")
+@router.get("/admin")
 async def get_admin_data(matricula: str):
     db_admin = await get_admin_by_matricula(matricula)
 
