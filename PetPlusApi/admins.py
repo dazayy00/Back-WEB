@@ -21,3 +21,14 @@ async def get_admin_by_id(id: str):
         return admin
     else:
         raise HTTPException(status_code=404, detail=f"Admin with ID '{id}' not found")
+
+
+
+usa este 
+ @app.get('/api/admins/matricula/{matricula}', response_model=Admin)
+async def get_admin_by_matricula(matricula: str):
+    admin = await get_one_admin_by_matricula(matricula)
+    if admin:
+        return admin
+    else:
+        raise HTTPException(status_code=404, detail=f"Admin with Matricula '{matricula}' not found")
