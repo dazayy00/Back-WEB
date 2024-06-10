@@ -5,77 +5,87 @@ import requests
 
 app = FastAPI()
 
-class DispositivoBase(BaseModel):
+#codigo a implementar
+class PetBase(BaseModel):
+    id_race: str
+    id_user: str
     id: str
-    status: str
-    owner_id: str
+    name: str
+    weight: str
+    age: str
 
-class DispositivoCreate(DispositivoBase):
+class PetCreate(PetBase):
     pass
 
-class Dispositivo(DispositivoBase):
+class Pet(PetBase):
     pass
 
-@app.get("/dispositivos", response_model=List[Dispositivo])
-async def get_all_dispositivos():
+@app.get("/pets", response_model=List[Pet])
+async def get_all_pets():
     response = requests.get("https://eouww9yquk.execute-api.us-east-1.amazonaws.com/pets/get_pets")
     if response.status_code == 200:
-        datos_dispositivos = response.json()["pets"]
-        dispositivos = []
-        for dato_dispositivo in datos_dispositivos:
-            dispositivo = Dispositivo(
-                id=dato_dispositivo["id"],
-                status=dato_dispositivo["status"],
-                owner_id=dato_dispositivo["owner_id"]
+        datos_pets = response.json()["pets"]
+        pets = []
+        for dato_pet in datos_pets:
+            pet = Pet(
+                id_race=dato_pet["id_race"],
+                id_user=dato_pet["id_user"],
+                id=dato_pet["id"],
+                name=dato_pet["name"],
+                weight=dato_pet["weight"],
+                age=dato_pet["age"]
             )
-            dispositivos.append(dispositivo)
-        return dispositivos
+            pets.append(pet)
+        return pets
     else:
         raise HTTPException(status_code=response.status_code, detail="Error al obtener datos")
 
-async def get_dispositivo(dispositivo_id: str) -> Dispositivo:
-    response = requests.get(f"https://eouww9yquk.execute-api.us-east-1.amazonaws.com/pets/get_pet?id={dispositivo_id}")
+async def get_pet(pet_id: str) -> Pet:
+    response = requests.get(f"https://eouww9yquk.execute-api.us-east-1.amazonaws.com/pets/get_pet?id={pet_id}")
     if response.status_code == 200:
-        dato_dispositivo = response.json()
-        dispositivo = Dispositivo(
-            id=dato_dispositivo["id"],
-            status=dato_dispositivo["status"],
-            owner_id=dato_dispositivo["owner_id"]
+        dato_pet = response.json()
+        pet = Pet(
+            id_race=dato_pet["id_race"],
+            id_user=dato_pet["id_user"],
+            id=dato_pet["id"],
+            name=dato_pet["name"],
+            weight=dato_pet["weight"],
+            age=dato_pet["age"]
         )
-        return dispositivo
+        return pet
     else:
-        raise HTTPException(status_code=response.status_code, detail="Dispositivo no encontrado")
+        raise HTTPException(status_code=response.status_code, detail="Mascota no encontrada")
 
-@app.put("/dispositivos/{dispositivo_id}", response_model=Dispositivo)
-async def update_dispositivo(dispositivo_id: str, dispositivo_data: DispositivoCreate):
-    dispositivo_actual = await get_dispositivo(dispositivo_id)
+@app.put("/pets/{pet_id}", response_model=Pet)
+async def update_pet(pet_id: str, pet_data: PetCreate):
+    pet_actual = await get_pet(pet_id)
 
-    dispositivo_actual.status = dispositivo_data.status
+    pet_actual.id_race = pet_data.id_race
+    pet_actual.id_user = pet_data.id_user
+    pet_actual.name = pet_data.name
+    pet_actual.weight = pet_data.weight
+    pet_actual.age = pet_data.age
 
-    url = f"https://eouww9yquk.execute-api.us-east-1.amazonaws.com/pets/update_pet?id={dispositivo_id}"
+    url = f"https://eouww9yquk.execute-api.us-east-1.amazonaws.com/pets/update_pet?id={pet_id}"
     headers = {"Content-Type": "application/json"}
-    datos = dispositivo_actual.dict()
+    datos = pet_actual.dict()
 
     try:
         respuesta = requests.put(url, headers=headers, json=datos)
         respuesta.raise_for_status()
     except requests.exceptions.RequestException as error:
-        raise HTTPException(status_code=500, detail=f"Error al actualizar el dispositivo: {error}")
+        raise HTTPException(status_code=500, detail=f"Error al actualizar la mascota: {error}")
 
-    return dispositivo_actual
+    return pet_actual
 
-@app.delete("/dispositivos/{dispositivo_id}")
-async def delete_dispositivo(dispositivo_id: str):
-    url = f"https://eouww9yquk.execute-api.us-east-1.amazonaws.com/pets/delete_pet?id={dispositivo_id}"
+@app.delete("/pets/{pet_id}")
+async def delete_pet(pet_id: str):
+    url = f"https://eouww9yquk.execute-api.us-east-1.amazonaws.com/pets/delete_pet?id={pet_id}"
 
     try:
         respuesta = requests.delete(url)
         respuesta.raise_for_status()
     except requests.exceptions.RequestException as error:
-        raise HTTPException(status_code=500, detail=f"Error al eliminar el dispositivo: {error}")
+        raise HTTPException(status_code=500, detail=f"Error al eliminar la mascota: {error}")
 
-    return {"mensaje": "Dispositivo eliminado exitosamente"}
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    return {"mensaje": "Mascota eliminada exitosamente"}
