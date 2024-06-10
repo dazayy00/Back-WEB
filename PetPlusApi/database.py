@@ -44,3 +44,6 @@ async def delete(id: str):
     await collection.delete_one({'_id': ObjectId(id)})
     return True
 
+async def get_admin_by_matricula(Matricula: str):
+    admin = await collection.find_one({'Matricula': Matricula})
+    return admin

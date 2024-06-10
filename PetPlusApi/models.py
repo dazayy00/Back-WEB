@@ -10,6 +10,5 @@ class Admin(BaseModel):
     Imagen: str
 
 class Login(BaseModel):
-    Nombre: str 
     Matricula: str  
 
