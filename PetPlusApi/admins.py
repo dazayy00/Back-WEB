@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from database import get_all_admins, create_admin, get_one_admin_by_id, update, delete
+from database import get_all_admins, get_one_admin_by_id
 from models import Admin
 from bson import ObjectId
 
